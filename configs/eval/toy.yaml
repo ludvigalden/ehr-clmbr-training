@@ -1,0 +1,24 @@
+# Every evaluation hook on the toy experiment. The toy held-out split is
+# small, so most of these numbers are masked at the tracking boundary; the
+# unmasked results stay in each hook's output directory.
+hooks:
+  - name: binary
+    options:
+      splits: [tuning, held_out]
+      settings: {resamples: 1000}
+      strata:
+        columns: [sex]
+        age_bins: [18, 50, 80, 120]
+  - name: paired
+    options:
+      a: logistic_probe
+      b: age_baseline
+      settings: {resamples: 1000}
+  - name: few_shot
+    options:
+      shots: [1, 2, 4, 8]
+      replicates: 3
+      probe: linear_head
+  - name: forgetting
+    options:
+      splits: [held_out]

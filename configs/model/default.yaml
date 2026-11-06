@@ -1,0 +1,7 @@
+# Base checkpoint directory (config.json, dictionary.msgpack,
+# model.safetensors). Required: set EHRFM_BASE_CHECKPOINT.
+base_checkpoint: ${oc.env:EHRFM_BASE_CHECKPOINT}
+# Optional SHA-256 pin of model.safetensors.
+expected_weights_sha256: null
+# auto, cpu, cuda, cuda:<n> or mps.
+device: auto

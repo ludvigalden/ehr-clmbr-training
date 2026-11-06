@@ -1,0 +1,24 @@
+# Evaluation hooks, as a list of {name, options} entries; they run after
+# every head hook. The evaluation toolkit registers these:
+#   binary      discrimination (AUROC with DeLong and bootstrap intervals,
+#               AUPRC), calibration (ECE, Brier, slope, intercept, bins),
+#               decision curve, optional strata, for every head
+#   paired      two heads compared: DeLong paired test, paired bootstrap of
+#               the AUROC difference, McNemar at a threshold
+#   few_shot    the EHRSHOT few-shot protocol on the representations;
+#               probe: logistic_regression (default) or linear_head (fits
+#               the servable linear head of linear_probe for every draw)
+#   forgetting  held-out next-code loss, base versus continued checkpoint
+# Each hook validates its options strictly; the statistical settings and
+# their defaults are:
+#   settings:
+#     resamples: 10000
+#     alpha: 0.05
+#     stratified_bootstrap: true
+#     calibration_bins: 15
+#     dca_threshold_min: 0.01
+#     dca_threshold_max: 0.20
+#     dca_threshold_step: 0.01
+# Strata and baseline covariates come from a per-subject table pinned by
+# its SHA-256: covariates: {path: ..., sha256: ...}.
+hooks: []

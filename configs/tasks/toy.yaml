@@ -1,0 +1,13 @@
+# The toy label set is generated with the toy inputs. Heads: the servable
+# linear head (options: configs/tasks/default.yaml), the scikit-learn probe on
+# the representations, and two covariate baselines from the generated
+# per-subject table (subject_id, sex, birth_time).
+label_sets: []
+heads:
+  - name: linear_probe
+  - name: logistic_probe
+  - name: age_baseline
+  - name: covariate_baseline
+    options:
+      categorical: [sex]
+      age_from: birth_time

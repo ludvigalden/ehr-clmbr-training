@@ -1,0 +1,14 @@
+# Label sets to extract representations for, as a list of
+# {name, labels} entries; empty means one representation per subject.
+label_sets: []
+# Head hooks, as a list of {name, options} entries. The task-head hook is
+# linear_probe: a logistic linear head on the frozen representations,
+# saved as a servable head bound to the encoder weights. Its options
+# (all optional, validated strictly):
+#   task: <label set name>        # required when there are several
+#   c_grid: [1.0e-8, ..., 1.0e4]  # inverse L2 strengths, chosen on tuning AUROC
+#   class_weight: balanced        # or none
+#   standardize: true             # folded into the saved weights
+#   max_iter: 500                 # L-BFGS iterations per strength
+# e.g. heads: [{name: linear_probe, options: {task: my_task}}]
+heads: []

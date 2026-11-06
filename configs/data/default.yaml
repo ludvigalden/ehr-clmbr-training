@@ -1,0 +1,5 @@
+# Verified MEDS extract directory. Required: set EHRFM_EXTRACT.
+extract: ${oc.env:EHRFM_EXTRACT}
+# Optional concept-set export the base dictionary must match.
+concept_set: null
+toy: null

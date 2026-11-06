@@ -1,0 +1,6 @@
+# Generate a seeded synthetic extract, label set and checkpoint.
+extract: null
+concept_set: null
+toy:
+  subjects: 60
+  seed: 7

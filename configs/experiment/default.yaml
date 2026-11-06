@@ -1,0 +1,77 @@
+# Experiment identity, work directory and stage settings.
+name: default
+seed: 0
+# Root of the stage caches, the pretraining run and the default MLflow
+# store. Required: set EHRFM_WORK_DIR.
+work_dir: ${oc.env:EHRFM_WORK_DIR}/${experiment.name}
+hook_modules: []
+
+coverage:
+  enabled: true
+  top_n: 20
+  min_events: 10
+
+pretraining:
+  enabled: false
+  optimization:
+    seed: 0
+    tokens_per_batch: 8192
+    epochs: 1
+    max_steps: null
+    learning_rate: 1.0e-4
+    weight_decay: 0.01
+    warmup_steps: 0
+    schedule: cosine
+    max_grad_norm: 1.0
+    validation_fraction: 0.1
+    clmbr_vocab_size: null
+    precision: fp32
+    vocab_expansion:
+      hook: null
+      n_replace: 0
+  checkpoint_every: 500
+  keep_checkpoints: 2
+  log_every: 10
+  tokenize_workers: 1
+  deterministic: true
+
+representations:
+  splits: [train, tuning, held_out]
+  tokens_per_batch: 8192
+
+tracking:
+  enabled: true
+  # null: a local file store at <work_dir>/mlruns.
+  uri: null
+  # null: the experiment name.
+  experiment_name: null
+
+# Small-cell suppression at the tracking boundary: any count below the
+# threshold is masked before it reaches MLflow parameters, metrics or
+# artifacts (see ehrfm.config.experiment.SmallCellPolicy).
+suppression:
+  threshold: 5
+  count_fields:
+    - n
+    - n_*
+    - count
+    - counts
+    - "*_count"
+    - "*_counts"
+    - events
+    - events_*
+    - "*_events"
+    - subjects
+    - subjects_*
+    - "*_subjects"
+    - labels
+    - labels_*
+    - "*_labels"
+    - positives
+    - negatives
+    - "*_positive"
+    - "*_negative"
+    - support
+  suppress_zero: true
+  mask_group: true
+  complementary: true

@@ -1,0 +1,15 @@
+# Root of the experiment configuration tree.
+#
+# Each group below maps one-to-one onto a field of
+# ehrfm.config.experiment.ExperimentConfig, which rejects unknown keys.
+# Select an experiment and override keys on the command line:
+#   ehrfm run configs/experiment/toy.yaml experiment.seed=3
+# Paths are read from the environment; an unset variable without a
+# default fails before anything runs.
+defaults:
+  - _self_
+  - model: default
+  - data: default
+  - tasks: default
+  - eval: default
+  - experiment: default

@@ -1,0 +1,30 @@
+# @package _global_
+# End-to-end run on generated synthetic data, on the CPU, in seconds:
+# toy inputs, coverage, 18 steps of continued pretraining, representations
+# for the toy label set, the toy heads and every evaluation hook. The work
+# directory defaults to ./outputs/toy (set EHRFM_WORK_DIR to move it).
+defaults:
+  - default@experiment
+  - override /model: toy
+  - override /data: toy
+  - override /tasks: toy
+  - override /eval: toy
+  - _self_
+
+experiment:
+  name: toy
+  work_dir: ${oc.env:EHRFM_WORK_DIR,outputs}/${experiment.name}
+  pretraining:
+    enabled: true
+    optimization:
+      tokens_per_batch: 96
+      epochs: 3
+      learning_rate: 3.0e-3
+      warmup_steps: 2
+      schedule: cosine
+      validation_fraction: 0.2
+      clmbr_vocab_size: 16
+    checkpoint_every: 5
+    log_every: 5
+  representations:
+    tokens_per_batch: 96

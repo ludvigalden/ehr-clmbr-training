@@ -1,0 +1,4 @@
+# The toy checkpoint is generated inside the work directory.
+base_checkpoint: null
+expected_weights_sha256: null
+device: cpu
