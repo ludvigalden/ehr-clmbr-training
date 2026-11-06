@@ -1,0 +1,27 @@
+ehr-clmbr-training
+Copyright 2026 Ludvig Aldén
+
+This project is licensed under the Apache License, Version 2.0. A copy
+of the licence is in the LICENSE file.
+
+Third-party code
+----------------
+
+* src/ehrfm/eval/_delong.py contains code vendored from
+  yandexdataschool/roc_comparison
+  (https://github.com/yandexdataschool/roc_comparison,
+  compare_auc_delong_xu.py), licensed under the MIT License,
+  Copyright (c) 2021 Nikita Kazeev. The full MIT permission notice is
+  reproduced verbatim in LICENSES/MIT-roc_comparison.txt and in the
+  module's docstring.
+
+  Algorithm reference: Xu Sun and Weichao Xu, "Fast Implementation of
+  DeLong's Algorithm for Comparing the Areas Under Correlated Receiver
+  Operating Characteristic Curves", IEEE Signal Processing Letters,
+  21(11), 1389-1393, 2014.
+
+Data licensing
+--------------
+
+Datasets and data outputs released by this project are licensed
+CC-BY-4.0 unless stated otherwise.

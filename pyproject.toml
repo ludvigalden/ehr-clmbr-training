@@ -1,0 +1,165 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "ehr-clmbr-training"
+version = "0.1.0"
+description = "Continued pretraining, task heads, evaluation and serving for CLMBR-style EHR foundation models on MEDS data"
+readme = "README.md"
+authors = [{ name = "Ludvig Aldén" }, { name = "Gabriel Gabro" }]
+requires-python = ">=3.12,<3.13"
+license = "Apache-2.0"
+license-files = ["LICENSE", "NOTICE"]
+
+dependencies = [
+  # Deep-learning core for continued pretraining and head training. CPU
+  # wheels are selected for the lock and CI through the pytorch-cpu index
+  # override in [tool.uv].
+  "torch>=2.1",
+  # Upper bound: femr 0.2.x collate requires exactly one packed row per
+  # step; transformers>=4.46 (get_batch_samples grad-accum rewrite) feeds
+  # more and trips its assert during gradient accumulation.
+  "transformers>=4.30,<4.46",
+  # CLMBR/FEMR model loading, tokenization and inference.
+  "femr>=0.2,<0.3",
+  # femr 0.2.x requires exactly this MEDS schema version.
+  "meds==0.3.3",
+  # Runtime-stable home of SubjectDatabase (femr 0.2.x dropped the
+  # femr.PatientDatabase re-export); pinned top-level rather than relied
+  # on as a transitive of femr. Upper bound: meds-reader 0.2.0 switched
+  # to meds>=0.4.1, which conflicts with femr 0.2.x's meds==0.3.3 pin;
+  # 0.1.9 pins exactly meds==0.3.3.
+  "meds-reader>=0.1.9,<0.2",
+  # Columnar I/O for MEDS parquet inputs and evaluation frames.
+  "polars>=0.20",
+  # Columnar I/O for MEDS parquet inputs and evaluation frames. Upper
+  # bound: pyarrow 26 hard-fails at import on NumPy 1.x ("pyarrow
+  # requires NumPy 2.0 or newer"). NumPy stays on 1.x because femr
+  # 0.2.4 exact-pins nptyping==2.4.1, which declares numpy>=1.20,<2.0;
+  # pyarrow does not declare the clash in its metadata, so the resolver
+  # cannot see it and it surfaces only at import time.
+  "pyarrow>=14.0,<26",
+  # Typed, validated configuration at every boundary.
+  "pydantic>=2.0",
+  # Experiment configuration composition, mirrored into pydantic models.
+  "hydra-core>=1.3",
+  # Experiment tracking backend.
+  "mlflow>=2.12",
+  # Head baselines and evaluation metrics.
+  "scikit-learn>=1.3",
+  # Decision-curve analysis (net benefit and plotting helpers).
+  "dcurves>=1.1.7",
+  # Serving API.
+  "fastapi>=0.115",
+  "uvicorn[standard]>=0.30",
+  # Command-line interface.
+  "typer[standard]>=0.12",
+  # Gated-release fetching (`ehrfm fetch-model`); read by name in the
+  # fetch module's Hugging Face call.
+  "huggingface_hub>=0.23",
+  # Structured logging.
+  "structlog>=24.0",
+  # Reading msgpack payloads inside model-artifact directories.
+  "msgpack>=1.0",
+]
+
+[project.optional-dependencies]
+gpu = [
+  # Memory-efficient attention kernels for GPU training runs.
+  "xformers>=0.0.26",
+]
+dev = [
+  "pytest>=8.0",
+  "pytest-cov>=4.1",
+  "ruff>=0.11.5",
+  "basedpyright>=1.25",
+  "httpx>=0.27",
+  "pyarrow-stubs>=17",
+]
+
+[project.scripts]
+ehrfm = "ehrfm.cli:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ehrfm"]
+
+# torch-hawk has no arm64 wheel and its sdist needs bazel plus CUDA to
+# build, so a CPU-only arm64 host cannot install it. The override below
+# drops it from resolution everywhere. femr 0.2.4 imports torch_hawk
+# unconditionally at module level (femr/models/transformer.py), so
+# ehrfm.models._compat registers a minimal torch_hawk module when the real
+# one is absent; importing ehrfm.models installs it. CLMBR checkpoints use
+# uniform attention in every layer and the checkpoint loader replaces
+# femr's hawk layers before any forward pass, so the recurrent block is
+# never computed; under the shim, calling it raises. To re-enable the real
+# dependency (a published manylinux x86_64 wheel exists), delete the
+# override line and re-run uv lock.
+[tool.uv]
+override-dependencies = ["torch-hawk; python_version < '0'"]
+
+# Torch is resolved from the CPU wheel index on Linux, where the lock
+# serves CI and Docker; other platforms resolve torch from PyPI so macOS
+# development keeps working. The index is explicit so only torch is taken
+# from it. GPU runs install the CUDA build separately; the `gpu` extra
+# stays off in CI.
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+[tool.uv.sources]
+torch = [{ index = "pytorch-cpu", marker = "sys_platform == 'linux'" }]
+
+[tool.ruff]
+src = ["src"]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = [
+  "E", "W", # pycodestyle
+  "F",      # pyflakes
+  "UP",     # pyupgrade
+  "B",      # flake8-bugbear
+  "I",      # isort
+  "C4",     # flake8-comprehensions
+]
+ignore = [
+  "E501", # line too long (handled by the formatter)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"__init__.py" = ["F401"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["ehrfm"]
+
+[tool.basedpyright]
+include = ["src", "tests"]
+exclude = ["**/__pycache__", "**/.venv"]
+typeCheckingMode = "strict"
+pythonVersion = "3.12"
+pythonPlatform = "All"
+# Externally-typed leniency only: fast-moving scientific libraries ship
+# incomplete stubs; this project's own code stays strictly typed.
+reportMissingTypeStubs = false
+reportUnknownMemberType = false
+reportUnknownVariableType = false
+reportUnknownArgumentType = false
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = [
+  "--strict-markers",
+  "--strict-config",
+  "-ra",
+]
+markers = [
+  "real_model: loads the real CLMBR checkpoint (skipped unless EHRFM_MODEL_DIR is set; deselected in CI)",
+  "gpu: requires a GPU device (deselected in CI)",
+]
+
+[tool.coverage.run]
+source = ["ehrfm"]
+omit = ["tests/*", "**/__pycache__/*"]
