@@ -76,6 +76,7 @@ SHA-256, exiting 2 on any mismatch. See
 - [compute-environment](context/reference/compute-environment.md) — the sensitive-data enclave, aarch64 build notes
 - [model-licensing](context/reference/model-licensing.md) — pins, the gated licence, what ships
 - [testing](context/reference/testing.md) — toy fixtures, markers, hermetic CPU CI
+- [repository-conventions](context/reference/repository-conventions.md) — scope, layout, what is never committed, commit rules
 
 ## Licence
 

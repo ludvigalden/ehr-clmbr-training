@@ -1,0 +1,10 @@
+title: ehr-clmbr-training
+description: >-
+  Design and reference notes for ehr-clmbr-training: consuming the
+  verified MEDS/FEMR artifacts of ehr-omop-meds-femr, preparing and
+  continuing to pretrain the CLMBR-T-Base checkpoint, task heads,
+  evaluation, tracking with small-cell suppression, serving, model
+  licensing, testing, and the repository's own conventions.
+path: github.com/ludvigalden/ehr-clmbr-training
+name: ehr_clmbr_training
+requires: []
